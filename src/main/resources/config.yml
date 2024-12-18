@@ -1,0 +1,53 @@
+# Настройки для базы данных
+database_settings:
+  mysql: false # Если false - будет использована локальная база sqlite
+  mariadb: true # Если использовать ли драйвера mariadb, если mysql включён?
+
+  hostname: "127.0.0.1:3306"
+  user: "user"
+  password: "password"
+  databasename: "playerdata"
+  connection_parameters: "?autoReconnect=true&initialTimeout=1&useSSL=false"
+
+# Основные настройки
+main_settings:
+  # Форматирование текста.
+  # LEGACY - цвет через & и hex &#
+  # LEGACY_ADVANCED - улучшенный аналог legacy с поддержкой &## формата hex
+  # MINIMESSAGE - цвет через <цвет>
+  # MINIMESSAGE был добавлен в новых версиях (1.17+)
+  serializer: LEGACY
+  # Должен ли быть по умолчанию включён запрет подъёма?
+  # Если включён - игроку будет достаточно лишь добавить материалы в список
+  # Если выключен - игроку будет необходимо прописать /picklimit enable
+  default_enabled: true
+  # Включить ли режим вайтлиста для подъёма?
+  # Если включен вайтлист - игрок сможет поднимать блоки только из указанного им списка
+  whitelist: false
+  # В каких мирах будет действовать запрет?
+  active_worlds:
+    - 'spawn'
+    - 'world'
+    - 'world_nether'
+    - 'world_the_end'
+
+# Сообщения плагина
+messages:
+  no_perm: '&cУ вас нет прав.'
+  enabled: '&fБлокировка подъёма предметов &aвключена!'
+  already_enabled: '&fБлокировка подъёма предметов &cуже включена!'
+  disabled: '&fБлокировка подъёма предметов &cвыключена!'
+  already_disabled: '&fБлокировка подъёма предметов &aуже выключена!'
+  block_success: '&fВы успешно заблокировали материал &6%material%'
+  unblock_success: '&fВы успешно разблокировали материал &6%material%'
+  already_blocked: '&cМатериал %material% уже заблокирован вами!'
+  not_blocked: '&cМатериал %material% не заблокирован вами!'
+  incorrect_material: '&cОшибка! Материал &6%material% &cне найден!'
+  list: '&fЗаблокированные материалы на данный момент: &6%list%'
+  usage: |-
+    Использование.
+    &a/picklimit enable &f- включить блокировку подъёма предметов
+    &a/picklimit diable &f- отключить блокировку подъёма предметов
+    &a/picklimit add <ID> &f- добавить материал в список
+    &a/picklimit remove <ID> &f- убрать материал из списка
+    &a/picklimit list &f- посмотреть список всех заблокированных материалов

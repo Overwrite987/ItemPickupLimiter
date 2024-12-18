@@ -1,0 +1,8 @@
+name: ${project.name}
+main: ru.overwrite.pickuplimiter.Main
+author: Overwrite
+api-version: 1.16
+version: ${project.version}
+commands:
+  pickuplimiter:
+    aliases: [itempickuplimiter, picklimiter]
