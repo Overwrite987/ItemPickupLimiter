@@ -34,13 +34,9 @@ public class DatabaseManager {
 
     public void connect() throws SQLException {
         if (settings.useMysql()) {
-            try {
-                Class.forName(settings.useMariadb() ? "org.mariadb.jdbc.Driver" : "com.mysql.cj.jdbc.Driver");
-                String url = "jdbc:mysql://" + settings.hostname() + "/" + settings.databaseName() + settings.connectionParams();
-                connection = DriverManager.getConnection(url, settings.user(), settings.password());
-            } catch (ClassNotFoundException e) {
-                throw new SQLException("MySQL/MariaDB driver not found.", e);
-            }
+            String urlPrefix = settings.useMariadb() ? "jdbc:mariadb://" : "jdbc:mysql://";
+            String url = urlPrefix + settings.hostname() + "/" + settings.databaseName() + settings.connectionParams();
+            connection = DriverManager.getConnection(url, settings.user(), settings.password());
         } else {
             String sqlitePath = new File(plugin.getDataFolder(), settings.databaseName() + ".db").getAbsolutePath();
             String url = "jdbc:sqlite:" + sqlitePath;
