@@ -5,10 +5,10 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import ru.overwrite.pickuplimiter.configuration.Config;
 import ru.overwrite.pickuplimiter.utils.MaterialUtils;
-import ru.overwrite.pickuplimiter.utils.Utils;
 
 import java.util.*;
 
@@ -138,7 +138,7 @@ public class CommandClass implements CommandExecutor, TabCompleter {
             completions.add("list");
             return getResult(args, completions);
         }
-        return switch (args[0].toLowerCase()) {
+        return switch (args[0]) {
             case "add" -> {
                 completions.addAll(MaterialUtils.MATERIAL_NAMES);
                 yield getResult(args, completions);
@@ -158,7 +158,7 @@ public class CommandClass implements CommandExecutor, TabCompleter {
     private List<String> getResult(String[] args, List<String> completions) {
         final List<String> result = new ArrayList<>();
         for (String c : completions) {
-            if (Utils.startsWithIgnoreCase(c, args[args.length - 1])) {
+            if (StringUtil.startsWithIgnoreCase(c, args[args.length - 1])) {
                 result.add(c);
             }
         }

@@ -43,11 +43,4 @@ public final class Utils {
                 (c >= 'K' && c <= 'O') ||
                 c == 'X';
     }
-
-    public static boolean startsWithIgnoreCase(@NotNull String str, String prefix) {
-        if (prefix == null) {
-            return false;
-        }
-        return str.regionMatches(true, 0, prefix, 0, prefix.length());
-    }
 }
