@@ -5,4 +5,4 @@ api-version: 1.16
 version: ${project.version}
 commands:
   pickuplimiter:
-    aliases: [itempickuplimiter, picklimiter]
+    aliases: [itempickuplimiter, picklimiter, ignoreloot]

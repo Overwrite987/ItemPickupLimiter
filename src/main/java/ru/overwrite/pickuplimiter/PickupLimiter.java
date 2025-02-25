@@ -18,7 +18,7 @@ public class PickupLimiter implements Listener {
         this.databaseManager = plugin.getDatabaseManager();
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onPickup(EntityPickupItemEvent e) {
         if (!(e.getEntity() instanceof Player p)) {
             return;
