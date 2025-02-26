@@ -34,7 +34,7 @@ public class DatabaseManager {
 
     public void connect() throws SQLException {
         if (settings.useMysql()) {
-            String urlPrefix = settings.useMariadb() ? "jdbc:mariadb://" : "jdbc:mysql://";
+            String urlPrefix = settings.useMariadb() ? "jdbc:mariadb://" : "jdbc:mysql://"; // yeah. the greatest fucking way to do that. #weed
             String url = urlPrefix + settings.hostname() + "/" + settings.databaseName() + settings.connectionParams();
             connection = DriverManager.getConnection(url, settings.user(), settings.password());
         } else {
