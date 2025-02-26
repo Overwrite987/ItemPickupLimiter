@@ -5,6 +5,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import ru.overwrite.pickuplimiter.configuration.Config;
+import ru.overwrite.pickuplimiter.configuration.data.MainSettings;
 
 import java.util.Set;
 
@@ -28,10 +29,11 @@ public class PickupLimiter implements Listener {
         if (blockedMaterials == null) {
             return;
         }
-        if (!pluginConfig.getMainSettings().activeWorlds().contains(p.getWorld().getName())) {
+        MainSettings mainSettings = pluginConfig.getMainSettings();
+        if (!mainSettings.activeWorlds().contains(p.getWorld().getName())) {
             return;
         }
-        if (pluginConfig.getMainSettings().whitelist() != blockedMaterials.contains(e.getItem().getItemStack().getType().toString())) {
+        if (mainSettings.whitelist() != blockedMaterials.contains(e.getItem().getItemStack().getType().toString())) {
             e.setCancelled(true);
         }
     }
