@@ -1,14 +1,15 @@
 package ru.overwrite.pickuplimiter.utils;
 
+import lombok.experimental.UtilityClass;
 import org.bukkit.configuration.ConfigurationSection;
-import org.jetbrains.annotations.NotNull;
 import ru.overwrite.pickuplimiter.utils.color.*;
 
-public final class Utils {
+@UtilityClass
+public class Utils {
 
-    public static Colorizer COLORIZER;
+    public Colorizer COLORIZER;
 
-    public static void setupColorizer(ConfigurationSection mainSettings) {
+    public void setupColorizer(ConfigurationSection mainSettings) {
         COLORIZER = switch (mainSettings.getString("serializer", "LEGACY").toUpperCase()) {
             case "MINIMESSAGE" -> new MiniMessageColorizer();
             case "LEGACY" -> new LegacyColorizer();
@@ -17,9 +18,9 @@ public final class Utils {
         };
     }
 
-    public static final char COLOR_CHAR = '§';
+    public final char COLOR_CHAR = '§';
 
-    public static String translateAlternateColorCodes(char altColorChar, String textToTranslate) {
+    public String translateAlternateColorCodes(char altColorChar, String textToTranslate) {
         final char[] b = textToTranslate.toCharArray();
 
         for (int i = 0, length = b.length - 1; i < length; ++i) {
@@ -32,7 +33,7 @@ public final class Utils {
         return new String(b);
     }
 
-    private static boolean isValidColorCharacter(char c) {
+    private boolean isValidColorCharacter(char c) {
         return (c >= '0' && c <= '9') ||
                 (c >= 'a' && c <= 'f') ||
                 c == 'r' ||
