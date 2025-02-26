@@ -140,7 +140,7 @@ public class CommandClass implements CommandExecutor, TabCompleter {
             completions.add("list");
             return getResult(args, completions);
         }
-        return switch (args[0]) {
+        return switch (args[0].toLowerCase()) {
             case "add" -> {
                 completions.addAll(MaterialUtils.MATERIAL_NAMES);
                 yield getResult(args, completions);
