@@ -158,7 +158,8 @@ public class CommandClass implements CommandExecutor, TabCompleter {
 
     private List<String> getResult(String[] args, List<String> completions) {
         final List<String> result = new ArrayList<>();
-        for (String c : completions) {
+        for (int i = 0; i < completions.size(); i++) {
+            String c = completions.get(i);
             if (StringUtil.startsWithIgnoreCase(c, args[args.length - 1])) {
                 result.add(c);
             }
