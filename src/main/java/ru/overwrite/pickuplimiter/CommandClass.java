@@ -11,7 +11,10 @@ import ru.overwrite.pickuplimiter.configuration.Config;
 import ru.overwrite.pickuplimiter.configuration.data.Messages;
 import ru.overwrite.pickuplimiter.utils.MaterialUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class CommandClass implements CommandExecutor, TabCompleter {
 
@@ -71,16 +74,15 @@ public class CommandClass implements CommandExecutor, TabCompleter {
                 }
                 if (!databaseManager.getCachedPlayers().containsKey(playerName)) {
                     databaseManager.addPlayer(playerName, pluginConfig.getMainSettings().defaultEnabled(), Set.of(new String[]{material}));
-                    p.sendMessage(messages.blockSuccess().replace("%material%", material));
-                    return true;
+                } else {
+                    Set<String> materialSet = databaseManager.getCachedPlayers().get(playerName);
+                    if (materialSet.contains(material)) {
+                        p.sendMessage(messages.alreadyBlocked());
+                        return true;
+                    }
+                    materialSet.add(material);
+                    databaseManager.updatePlayer(playerName, materialSet);
                 }
-                Set<String> newSet = new HashSet<>(databaseManager.getCachedPlayers().get(playerName));
-                if (newSet.contains(material)) {
-                    p.sendMessage(messages.alreadyBlocked());
-                    return true;
-                }
-                newSet.add(material);
-                databaseManager.updatePlayer(playerName, newSet);
                 p.sendMessage(messages.blockSuccess().replace("%material%", material));
                 return true;
             }
@@ -94,29 +96,26 @@ public class CommandClass implements CommandExecutor, TabCompleter {
                     p.sendMessage(messages.incorrectMaterial());
                     return true;
                 }
-                Set<String> newSet = new HashSet<>(databaseManager.getCachedPlayers().get(playerName));
-                if (!newSet.contains(material)) {
+                Set<String> materialSet = databaseManager.getCachedPlayers().get(playerName);
+                if (!materialSet.contains(material)) {
                     p.sendMessage(messages.notBlocked().replace("%material%", material));
                     return true;
                 }
-                newSet.remove(material);
-                if (newSet.isEmpty()) {
+                materialSet.remove(material);
+                if (materialSet.isEmpty()) {
                     databaseManager.removePlayer(playerName);
-                    p.sendMessage(messages.unblockSuccess().replace("%material%", material));
-                    return true;
+                } else {
+                    databaseManager.updatePlayer(playerName, materialSet);
                 }
-                databaseManager.updatePlayer(playerName, newSet);
                 p.sendMessage(messages.unblockSuccess().replace("%material%", material));
                 return true;
             }
             case "list": {
-                Set<String> blocked = databaseManager.getCachedPlayers().get(p.getName());
-                if (blocked == null) {
-                    p.sendMessage(messages.list().replace("%list%", "NaN"));
-                    return true;
-                }
-                blocked = new TreeSet<>(databaseManager.getCachedPlayers().get(playerName));
-                p.sendMessage(messages.list().replace("%list%", blocked.toString()));
+                Set<String> blocked = databaseManager.getCachedPlayers().get(playerName);
+                String list = blocked == null
+                        ? "NaN"
+                        : new TreeSet<>(blocked).toString();
+                p.sendMessage(messages.list().replace("%list%", list));
                 return true;
             }
         }
@@ -125,13 +124,13 @@ public class CommandClass implements CommandExecutor, TabCompleter {
 
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
-        final List<String> completions = new ArrayList<>();
         if (!(sender instanceof Player p)) {
             return List.of();
         }
         if (!sender.hasPermission("pickuplimiter.use")) {
             return List.of();
         }
+        final List<String> completions = new ArrayList<>();
         if (args.length == 1) {
             completions.add("enable");
             completions.add("disable");
@@ -150,7 +149,7 @@ public class CommandClass implements CommandExecutor, TabCompleter {
                 if (blocked == null) {
                     yield List.of();
                 }
-                completions.addAll(databaseManager.getCachedPlayers().get(p.getName()));
+                completions.addAll(blocked);
                 yield getResult(args, completions);
             }
             default -> List.of();

@@ -2,7 +2,6 @@ package ru.overwrite.pickuplimiter;
 
 import lombok.Getter;
 import org.bukkit.command.PluginCommand;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import ru.overwrite.pickuplimiter.configuration.Config;
@@ -18,9 +17,9 @@ public final class Main extends JavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
         FileConfiguration config = getConfig();
-        databaseManager = new DatabaseManager(this, getDatabaseSettings(config));
+        databaseManager = new DatabaseManager(this);
         try {
-            databaseManager.connect();
+            databaseManager.connect(config.getConfigurationSection("database_settings"));
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
@@ -35,23 +34,6 @@ public final class Main extends JavaPlugin {
     public void setupPluginConfig(FileConfiguration config) {
         pluginConfig.setMainSettings(config);
         pluginConfig.setupMessages(config);
-    }
-
-    private DatabaseManager.DatabaseSettings getDatabaseSettings(FileConfiguration config) {
-        ConfigurationSection databaseSettings = config.getConfigurationSection("database_settings");
-        if (databaseSettings == null) {
-            throw new IllegalArgumentException("Database settings section is missing in configuration.");
-        }
-
-        return new DatabaseManager.DatabaseSettings(
-                databaseSettings.getBoolean("mysql", false),
-                databaseSettings.getBoolean("mariadb", false),
-                databaseSettings.getString("hostname", "127.0.0.1:3306"),
-                databaseSettings.getString("user", "user"),
-                databaseSettings.getString("password", "password"),
-                databaseSettings.getString("databasename", "playerdata"),
-                databaseSettings.getString("connection_parameters", "?autoReconnect=true&initialTimeout=1&useSSL=false")
-        );
     }
 
     public void onDisable() {

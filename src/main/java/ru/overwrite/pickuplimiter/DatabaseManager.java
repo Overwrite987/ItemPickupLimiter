@@ -2,46 +2,48 @@ package ru.overwrite.pickuplimiter;
 
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
 
 import java.io.File;
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DatabaseManager {
 
-    public record DatabaseSettings(
-            boolean useMysql,
-            boolean useMariadb,
-            String hostname,
-            String user,
-            String password,
-            String databaseName,
-            String connectionParams
-    ) {
-    }
-
     @Getter
-    private final Map<String, Set<String>> cachedPlayers = new HashMap<>();
+    private final Map<String, Set<String>> cachedPlayers = new ConcurrentHashMap<>();
 
     private final Main plugin;
-    private final DatabaseSettings settings;
     private Connection connection;
 
-    public DatabaseManager(Main plugin, DatabaseSettings settings) {
+    public DatabaseManager(Main plugin) {
         this.plugin = plugin;
-        this.settings = settings;
     }
 
-    public void connect() throws SQLException {
-        if (settings.useMysql()) {
-            String urlPrefix = settings.useMariadb() ? "jdbc:mariadb://" : "jdbc:mysql://"; // yeah. the greatest fucking way to do that. #weed
-            String url = urlPrefix + settings.hostname() + "/" + settings.databaseName() + settings.connectionParams();
-            connection = DriverManager.getConnection(url, settings.user(), settings.password());
-        } else {
-            String sqlitePath = new File(plugin.getDataFolder(), settings.databaseName() + ".db").getAbsolutePath();
-            String url = "jdbc:sqlite:" + sqlitePath;
-            connection = DriverManager.getConnection(url);
+    public void connect(ConfigurationSection databaseSettings) throws SQLException {
+        if (databaseSettings == null) {
+            throw new IllegalArgumentException("Database settings section is missing in configuration.");
         }
+
+        String storageType = databaseSettings.getString("storage_type", "sqlite");
+        String hostname = databaseSettings.getString("hostname", "127.0.0.1:3306");
+        String user = databaseSettings.getString("user", "user");
+        String password = databaseSettings.getString("password", "password");
+        String databaseName = databaseSettings.getString("databasename", "playerdata");
+        String connectionParams = databaseSettings.getString("connection_parameters", "?autoReconnect=true&initialTimeout=1&useSSL=false");
+
+        String url = switch (storageType) {
+            case "mysql" -> "jdbc:mysql://" + hostname + "/" + databaseName + connectionParams;
+            case "mariadb" -> "jdbc:mariadb://" + hostname + "/" + databaseName + connectionParams;
+            case "sqlite" -> {
+                String sqlitePath = new File(plugin.getDataFolder(), databaseName + ".db").getAbsolutePath();
+                yield "jdbc:sqlite:" + sqlitePath;
+            }
+            default -> throw new IllegalArgumentException("Unsupported storage type: " + storageType);
+        };
+
+        connection = DriverManager.getConnection(url, user, password);
         createTable();
         cachedPlayers.putAll(getAllEnabledPlayers());
         plugin.getLogger().info("Cached " + cachedPlayers.size() + " players from database.");
@@ -149,7 +151,8 @@ public class DatabaseManager {
     public Map<String, Set<String>> getAllEnabledPlayers() throws SQLException {
         String selectSQL = "SELECT player, list FROM Players WHERE enabled = true";
         Map<String, Set<String>> players = new HashMap<>();
-        try (Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery(selectSQL)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(selectSQL)) {
+            ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 String player = rs.getString("player");
                 String list = rs.getString("list");

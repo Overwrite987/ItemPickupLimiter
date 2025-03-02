@@ -36,7 +36,13 @@ public class Config {
                 Utils.COLORIZER.colorize(messagesSection.getString("not_blocked", "&cМатериал %material% не заблокирован вами!")),
                 Utils.COLORIZER.colorize(messagesSection.getString("incorrect_material", "&cОшибка! Материал &6%material% &cне найден!")),
                 Utils.COLORIZER.colorize(messagesSection.getString("list", "&fЗаблокированные материалы на данный момент: &6%list%")),
-                Utils.COLORIZER.colorize(messagesSection.getString("usage"))
+                Utils.COLORIZER.colorize(messagesSection.getString("usage", """
+                        Использование.
+                            &a/picklimit enable &f- включить блокировку подъёма предметов
+                            &a/picklimit diable &f- отключить блокировку подъёма предметов
+                            &a/picklimit add <ID> &f- добавить материал в список
+                            &a/picklimit remove <ID> &f- убрать материал из списка
+                            &a/picklimit list &f- посмотреть список всех заблокированных материалов"""))
         );
     }
 }
