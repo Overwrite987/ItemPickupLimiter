@@ -1,7 +1,7 @@
 # Настройки для базы данных
 database_settings:
-  mysql: false # Если false - будет использована локальная база sqlite
-  mariadb: true # Если использовать ли драйвера mariadb, если mysql включён?
+  # Поддерживаются sqlite, mysql, mariadb
+  storage_type: "sqlite"
 
   hostname: "127.0.0.1:3306"
   user: "user"
